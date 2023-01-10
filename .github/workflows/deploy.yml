@@ -23,6 +23,6 @@ jobs:
       - name: Deploy 🚀
         uses: enriikke/gatsby-gh-pages-action@v2
         with:
-          access-token: ${{ secrets.GITHUB_TOKEN }}
+          access-token: ${{ secrets.ACCESS_TOKEN }}
           deploy-branch: gh-pages
           gatsby-args: --prefix-paths
