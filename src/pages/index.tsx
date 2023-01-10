@@ -1,6 +1,5 @@
 import * as React from "react"
 import type { HeadFC, PageProps } from "gatsby"
-import App from "../components/App";
 import App2 from "../components/App2";
 
 const pageStyles = {
