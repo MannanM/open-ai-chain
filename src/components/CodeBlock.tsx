@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FormValues, QueryType } from "./Model";
+import { FormValues, mediumInput, QueryType } from "./Model";
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import docco from 'react-syntax-highlighter/dist/esm/styles/hljs/docco';
 
@@ -28,8 +28,13 @@ ${space}echo "${smallSpace}- $${value.variable}"
 
 `
         } else {
-            return `${space}TEMP=""
-${space}${value.variable}=$(echo "\${TEMP// /_}.png")
+            const callChain = props.queries
+                .filter((value2, index2) => value2.type === QueryType.List && index2 < index)
+                .map((value2) => '$' + value2.variable)
+                .join('_')
+
+            return `${space}TEMP="${callChain}"
+${space}${value.variable}=$(echo "files/\${TEMP// /_}.png")
 ${space}AiImage "${value.query}" "$${value.variable}"
 ${space}echo "${smallSpace} - Generated Image"
 
@@ -37,23 +42,20 @@ ${space}echo "${smallSpace} - Generated Image"
         }
     }).join('')
 
-    const jqArgList = props.queries.map((value, index) => {
+    const jqArgList = props.queries.map((value) => {
+        if (value.type === QueryType.Image) {
+            return `--arg ${value.variable} "file://${value.variable}"`
+        }
         return `--arg ${value.variable} "$${value.variable}"`
     }).join(' ')
-
-    //todo: fix spacing
-    const midSpace = ' '.repeat((props.queries.length - 1) * 4);
-
-    const jqField = props.queries
-        .filter(value => value.type === QueryType.List)
-        .map((value) => `[$${value.variable}]`)
-        .join('')
-
     const jqValue = props.queries
-        .filter(value => value.type !== QueryType.List)
         .map((value) => `"${value.variable}": $${value.variable}`)
         .join()
 
+    const trueIndent = props.queries.filter((value) => value.type === QueryType.List).length
+    const midSpace = ' '.repeat((trueIndent) * 4);
+
+    // reverse everything to add a `done` at the end
     const end = props.queries.map((value, index) => {
         if (value.type != QueryType.List) {
             return ''
@@ -66,7 +68,7 @@ ${space}echo "${smallSpace} - Generated Image"
 `
     }).reverse().join('')
 
-    const codeString = `
+    const codeString = `#!/bin/bash
 
 function AiText() {
     local promptval="{\\"model\\": \\"text-davinci-003\\", \\"prompt\\": \\"$1\\", \\"temperature\\": 0, \\"max_tokens\\": 500}"
@@ -84,6 +86,7 @@ function AiText() {
     fi
 }
 
+mkdir files
 function AiImage() {
     local promptval="{ \\"prompt\\": \\"$1\\", \\"n\\": 1, \\"size\\": \\"1024x1024\\" }"
     echo "$promptval" >> prompt_log.txt
@@ -99,7 +102,7 @@ function AiImage() {
 OUTPUT="{}"
 ${start}${midSpace}TEMP=$(echo "$OUTPUT" | jq \\
 ${midSpace}         ${jqArgList} \\
-${midSpace}         '.results${jqField} += [{${jqValue}}]')
+${midSpace}         '.results += [{${jqValue}}]')
 ${midSpace}OUTPUT="$TEMP"
 ${end}
 echo "$OUTPUT" > results.json
@@ -109,8 +112,8 @@ echo "Completed"
         <SyntaxHighlighter showLineNumbers={true} style={docco}>
             {codeString}
         </SyntaxHighlighter>
-        <button onClick={() => navigator.clipboard.writeText(codeString)}>
-            Copy to Clipboard
+        <button onClick={() => navigator.clipboard.writeText(codeString)} style={mediumInput}>
+            📋 Copy to Clipboard
         </button>
     </>;
 };
