@@ -1,0 +1,32 @@
+{
+  "results": [
+    {
+      "city": "Bogota",
+      "dish": "Ajiaco Bogotano",
+      "blog": "If you're looking for a unique and delicious culinary experience, then you must try the famous Ajiaco Bogotano from the city of Bogota in Colombia. This traditional dish is a hearty soup made with chicken, potatoes, corn, and a variety of herbs and spices. It's a comforting and flavorful meal that will leave you wanting more. The combination of ingredients creates a unique flavor that is sure to tantalize your taste buds. Plus, it's a great way to get a taste of the local culture. So, if you're looking for a delicious and unique meal, then Ajiaco Bogotano is a must-try!",
+      "appearance": "Ajiaco Bogotano is a traditional Colombian soup made with chicken, three varieties of potatoes, and a variety of herbs and spices. It is usually served with a side of white rice, avocado, and a dollop of sour cream. The soup is a thick, creamy, and hearty stew with a yellowish-orange hue. It is usually garnished with capers, cilantro, and a slice of lemon.",
+      "image": "file://files/Ajiaco_Bogotano.png"
+    },
+    {
+      "city": "Bogota",
+      "dish": "Bandeja Paisa",
+      "blog": "If you're looking for a truly unique and delicious culinary experience, then you must try the famous dish 'Bandeja Paisa' from the city of Bogota in Colombia. This traditional dish is a combination of beans, rice, plantain, chorizo, beef, pork, arepa, and avocado, all served on a single plate. It's a hearty and flavorful meal that will leave you feeling satisfied and energized. The combination of flavors and textures is truly unique and will leave you wanting more. Plus, it's a great way to get a taste of the local culture and cuisine. So, if you're ever in Bogota, make sure to try the famous Bandeja Paisa!",
+      "appearance": "Bandeja Paisa is a traditional Colombian dish from the city of Bogota. It is a large platter of food that includes white rice, red beans, ground beef, chorizo, plantain, arepa, avocado, a fried egg, and a slice of chicharrón (fried pork belly). The dish is usually served with a side of hogao (tomato and onion sauce). The colors of the dish are vibrant and the presentation is very eye-catching.",
+      "image": "file://files/Bandeja_Paisa.png"
+    },
+    {
+      "city": "Cartagena",
+      "dish": "Sancocho de Gallina",
+      "blog": "If you're looking for a unique and delicious food experience in Cartagena, Colombia, then you must try the famous Sancocho de Gallina. This traditional dish is a hearty stew made with chicken, potatoes, yucca, plantains, and a variety of herbs and spices. The flavors are bold and complex, and the texture is comforting and satisfying. It's the perfect meal to enjoy after a long day of exploring the city. Plus, it's a great way to get a taste of the local culture. So don't miss out on this delicious dish when you visit Cartagena!",
+      "appearance": "Sancocho de Gallina from Cartagena is a hearty soup made with chicken, potatoes, yucca, plantains, and a variety of herbs and spices. It is usually served in a large bowl and is a deep yellow-orange color due to the combination of ingredients. The soup is thick and creamy, and the chicken is usually cooked until it is tender and falling off the bone. The potatoes, yucca, and plantains are usually cut into large chunks and add a unique texture to the soup. The herbs and spices give the soup a unique flavor that is both savory and slightly sweet.",
+      "image": "file://files/Sancocho_de_Gallina.png"
+    },
+    {
+      "city": "Cartagena",
+      "dish": "Rondón de Pescado",
+      "blog": "null",
+      "appearance": "null",
+      "image": "file://files/Rondón_de_Pescado.png"
+    }
+  ]
+}

@@ -1,7 +1,9 @@
 import * as React from "react";
 import { useForm, useFieldArray, useWatch, Control } from "react-hook-form";
-import { FormValues, largeInput, mediumInput, QueryType, smallInput } from "./Model";
+import { FormValues, QueryType } from "./Model";
 import { CodeBlock } from "./CodeBlock";
+import { Button, Col, Form, Row } from "react-bootstrap";
+import { FieldErrors } from "react-hook-form/dist/types/errors";
 
 let renderCount = 0;
 
@@ -48,76 +50,93 @@ export default function App() {
         control
     });
     const onSubmit = (data: FormValues) => console.log(data);
+    const onError = (error: FieldErrors<FormValues>) => {
+        console.log("ERROR:::", error);
+    };
     renderCount++;
 
     return (
-        <div>
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <input style={mediumInput} {...register("apiKey")} placeholder="Your API Key"/>
-                {fields.map((field, index) => {
-                    return (
-                        <div key={field.id}>
-                            <section className={"section"} key={field.id}>
-                                <select
-                                    {...register(`queries.${index}.type` as const, {
-                                        required: true
-                                    })}
-                                    style={smallInput}
-                                    className={errors?.queries?.[index]?.type ? "error" : ""}
-                                    defaultValue={field.type}>
-                                    <option value={QueryType.List}>List</option>
-                                    <option value={QueryType.Detail} disabled={index === 0}>Detail</option>
-                                    <option value={QueryType.Image} disabled={index === 0}>Image</option>
-                                </select>
-                                <input
-                                    placeholder="query"
-                                    type="text"
-                                    {...register(`queries.${index}.query` as const, {
-                                        required: true
-                                    })}
-                                    style={largeInput}
-                                    className={errors?.queries?.[index]?.query ? "error" : ""}
-                                    defaultValue={field.query}
-                                />
-                                <input
-                                    placeholder="variable"
-                                    type="text"
-                                    {...register(`queries.${index}.variable` as const, {
-                                        required: true
-                                    })}
-                                    className={errors?.queries?.[index]?.variable ? "error" : ""}
-                                    style={smallInput}
-                                    defaultValue={field.variable}
-                                />
-                                <button
-                                    type="button"
-                                    style={smallInput}
-                                    onClick={() => remove(index)}
-                                    disabled={index === 0}
-                                >
-                                    🗑️ Delete
-                                </button>
-                            </section>
-                        </div>
-                    );
-                })}
+        <Row>
+            <Col>
+                <Form onSubmit={handleSubmit(onSubmit, onError)}>
+                    <Form.Group className="mb-3" controlId="formApiKey">
+                        <Form.Label>Open AI API Key</Form.Label>
+                        <Form.Control
+                            placeholder="Your API Key"
+                            {...register("apiKey", {required: "Correo es obligatorio"})}
+                        />
+                        {errors.apiKey && (
+                            <Form.Text className="text-danger">
+                                {errors.apiKey.message}
+                            </Form.Text>
+                        )}
+                    </Form.Group>
+                    {fields.map((field, index) => {
+                        return (
+                            <Row key={field.id} className='gx-0'>
+                                <Col sm={1}>
+                                    <Form.Select
+                                        {...register(`queries.${index}.type` as const, {
+                                            required: true
+                                        })}
+                                        className={errors?.queries?.[index]?.type ? "error" : ""}
+                                        defaultValue={field.type}>
+                                        <option value={QueryType.List}>List</option>
+                                        <option value={QueryType.Detail} disabled={index === 0}>Detail</option>
+                                        <option value={QueryType.Image} disabled={index === 0}>Image</option>
+                                    </Form.Select>
+                                </Col>
+                                <Col>
+                                    <Form.Control
+                                        placeholder="query"
+                                        type="text"
+                                        {...register(`queries.${index}.query` as const, {
+                                            required: true
+                                        })}
+                                        className={errors?.queries?.[index]?.query ? "error" : ""}
+                                        defaultValue={field.query}
+                                    />
+                                </Col>
+                                <Col sm={2}>
+                                    <Form.Control
+                                        placeholder="variable"
+                                        type="text"
+                                        {...register(`queries.${index}.variable` as const, {
+                                            required: true
+                                        })}
+                                        className={errors?.queries?.[index]?.variable ? "error" : ""}
+                                        defaultValue={field.variable}
+                                    />
+                                </Col>
+                                <Col sm={1}>
+                                    <Button
+                                        variant="outline-danger"
+                                        onClick={() => remove(index)}
+                                        disabled={index === 0}
+                                    >
+                                        🗑️
+                                    </Button>
+                                </Col>
+                            </Row>
+                        );
+                    })}
 
-                <button
-                    type="button"
-                    style={smallInput}
-                    onClick={() =>
-                        append({
-                            type: QueryType.List,
-                            query: 'What is the name of the top 5 trending food dishes?',
-                            variable: 'dish'
-                        })
-                    }
-                >
-                    ➕ Add
-                </button>
-                {/*<input type="submit"/>*/}
-                <Total control={control}/>
-            </form>
-        </div>
+                    <Button
+                        variant="outline-primary"
+                        onClick={() =>
+                            append({
+                                type: QueryType.List,
+                                query: 'What is the name of the top 5 trending food dishes?',
+                                variable: 'dish'
+                            })
+                        }
+                    >
+                        ➕ Add
+                    </Button>
+                    {/*<input type="submit"/>*/}
+                    <Total control={control}/>
+                </Form>
+            </Col>
+        </Row>
     );
 }

@@ -1,15 +1,15 @@
 import * as React from "react"
 import type { HeadFC, PageProps } from "gatsby"
 import App from "../components/App";
+import { Main } from "../components/layout/Main";
+
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const IndexPage: React.FC<PageProps> = () => {
   return (
-    <main>
-      <h1>
-        open-ai-chain
-      </h1>
-      <App />
-    </main>
+    <Main>
+        <App />
+    </Main>
   )
 }
 

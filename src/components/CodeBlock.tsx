@@ -1,7 +1,8 @@
 import * as React from "react";
-import { FormValues, mediumInput, QueryType } from "./Model";
+import { FormValues, QueryType } from "./Model";
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import docco from 'react-syntax-highlighter/dist/esm/styles/hljs/docco';
+import { Button } from "react-bootstrap";
 
 export const CodeBlock = (props: FormValues) => {
     console.log(props.apiKey)
@@ -44,7 +45,7 @@ ${space}echo "${smallSpace} - Generated Image"
 
     const jqArgList = props.queries.map((value) => {
         if (value.type === QueryType.Image) {
-            return `--arg ${value.variable} "file://${value.variable}"`
+            return `--arg ${value.variable} "file://$${value.variable}"`
         }
         return `--arg ${value.variable} "$${value.variable}"`
     }).join(' ')
@@ -112,8 +113,8 @@ echo "Completed"
         <SyntaxHighlighter showLineNumbers={true} style={docco}>
             {codeString}
         </SyntaxHighlighter>
-        <button onClick={() => navigator.clipboard.writeText(codeString)} style={mediumInput}>
+        <Button onClick={() => navigator.clipboard.writeText(codeString)} variant="outline-dark">
             📋 Copy to Clipboard
-        </button>
+        </Button>
     </>;
 };
