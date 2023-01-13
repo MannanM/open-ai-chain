@@ -20,6 +20,14 @@ const config: GatsbyConfig = {
   }, {
     resolve: 'gatsby-source-filesystem',
     options: {
+      "name": "content_images",
+      "path": "./content/",
+      "ignore": ["*.json"]
+    },
+    __key: "content_images"
+  }, {
+    resolve: 'gatsby-source-filesystem',
+    options: {
       "name": "pages",
       "path": "./src/pages/"
     },
