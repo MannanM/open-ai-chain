@@ -4,7 +4,7 @@ import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import docco from 'react-syntax-highlighter/dist/esm/styles/hljs/docco';
 import { Button } from "react-bootstrap";
 
-export const CodeBlock = (props: FormValues) => {
+export const CodeBlock = React.memo((props: FormValues) => {
     console.log(props.apiKey)
 
     const start = props.queries.map((value, index) => {
@@ -100,13 +100,13 @@ function AiImage() {
     curl --output "$2" -s "$url"
 }
 
-OUTPUT="{}"
+OUTPUT="{\\"queries\\": ${JSON.stringify(props.queries, null, 2).replaceAll('"', '\\"')}}"
 ${start}${midSpace}TEMP=$(echo "$OUTPUT" | jq \\
 ${midSpace}         ${jqArgList} \\
 ${midSpace}         '.results += [{${jqValue}}]')
 ${midSpace}OUTPUT="$TEMP"
+${midSpace}echo "$OUTPUT" > results.json
 ${end}
-echo "$OUTPUT" > results.json
 echo "Completed"
 `
     return <>
@@ -117,4 +117,4 @@ echo "Completed"
             📋 Copy to Clipboard
         </Button>
     </>;
-};
+});

@@ -4,11 +4,13 @@ export enum QueryType {
     Image = "IMAGE",
 }
 
+export type Query = {
+    type: QueryType;
+    variable: string;
+    query: string;
+}
+
 export type FormValues = {
     apiKey: string;
-    queries: {
-        type: QueryType;
-        variable: string;
-        query: string;
-    }[];
+    queries: Query[];
 };
