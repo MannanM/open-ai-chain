@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const IndexPage: React.FC<PageProps> = () => {
   return (
     <Main>
+        <h1 className="mt-3 mb-3">Create your chain!</h1>
         <App />
     </Main>
   )

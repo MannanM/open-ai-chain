@@ -2,7 +2,7 @@ import * as React from "react";
 import { useForm, useFieldArray, useWatch, Control } from "react-hook-form";
 import { FormValues, QueryType } from "./Model";
 import { CodeBlock } from "./CodeBlock";
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Accordion, Button, ButtonGroup, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { FieldErrors } from "react-hook-form/dist/types/errors";
 import { useState } from "react";
 import { Execute } from "./Execute";
@@ -12,7 +12,15 @@ let renderCount = 0;
 const Total = ({control}: { control: Control<FormValues> }) => {
     const queries = useWatch({name: "queries", control});
     const apiKey: string = useWatch({name: "apiKey", control});
-    return <CodeBlock apiKey={apiKey} queries={queries}/>;
+
+    return <Accordion>
+        <Accordion.Item eventKey="0">
+            <Accordion.Header>Code Generation - Bash Shell Script</Accordion.Header>
+            <Accordion.Body>
+                <CodeBlock apiKey={apiKey} queries={queries}/>
+            </Accordion.Body>
+        </Accordion.Item>
+    </Accordion>;
 };
 
 export default function App() {
@@ -23,6 +31,7 @@ export default function App() {
         formState: {errors}
     } = useForm<FormValues>({
         defaultValues: {
+            apiKey: localStorage.getItem('api-key') || '',
             queries: [{
                 type: QueryType.List,
                 query: 'What are the names of the five most popular cities to visit in Colombia for tourists?',
@@ -70,90 +79,87 @@ export default function App() {
                 <Col>
                     <Form onSubmit={handleSubmit(onSubmit, onError)}>
                         <fieldset disabled={executing}>
-                            <Form.Group className="mb-3" controlId="formApiKey">
-                                <Form.Label>Open AI API Key</Form.Label>
+                            <InputGroup className="mb-3">
+                                <InputGroup.Text>Open AI API Key</InputGroup.Text>
                                 <Form.Control
-                                    placeholder="Your API Key"
-                                    {...register("apiKey", {required: "Correo es obligatorio"})}
+                                    type="password"
+                                    placeholder="Your Open AI API Key"
+                                    {...register("apiKey", {required: true})}
                                 />
-                                {errors.apiKey && (
-                                    <Form.Text className="text-danger">
-                                        {errors.apiKey.message}
-                                    </Form.Text>
-                                )}
-                            </Form.Group>
+                                <Button
+                                    onClick={() => window.open("https://beta.openai.com/account/api-keys", "_blank")}
+                                >
+                                    🔎
+                                </Button>
+                            </InputGroup>
                             {fields.map((field, index) => {
                                 return (
-                                    <Row key={field.id} className='gx-0'>
-                                        <Col sm={1}>
-                                            <Form.Select
-                                                {...register(`queries.${index}.type` as const, {
-                                                    required: true
-                                                })}
-                                                className={errors?.queries?.[index]?.type ? "error" : ""}
-                                                defaultValue={field.type}>
-                                                <option value={QueryType.List}>List</option>
-                                                <option value={QueryType.Detail} disabled={index === 0}>Detail</option>
-                                                <option value={QueryType.Image} disabled={index === 0}>Image</option>
-                                            </Form.Select>
-                                        </Col>
-                                        <Col>
-                                            <Form.Control
-                                                placeholder="query"
-                                                type="text"
-                                                {...register(`queries.${index}.query` as const, {
-                                                    required: true
-                                                })}
-                                                className={errors?.queries?.[index]?.query ? "error" : ""}
-                                                defaultValue={field.query}
-                                            />
-                                        </Col>
-                                        <Col sm={2}>
-                                            <Form.Control
-                                                placeholder="variable"
-                                                type="text"
-                                                {...register(`queries.${index}.variable` as const, {
-                                                    required: true
-                                                })}
-                                                className={errors?.queries?.[index]?.variable ? "error" : ""}
-                                                defaultValue={field.variable}
-                                            />
-                                        </Col>
-                                        <Col sm={1}>
-                                            <Button
-                                                variant="outline-danger"
-                                                onClick={() => remove(index)}
-                                                disabled={index === 0}
-                                            >
-                                                🗑️
-                                            </Button>
-                                        </Col>
-                                    </Row>
+                                    <InputGroup key={field.id} className="mb-3">
+                                        <Form.Select
+                                            style={{width: '10%'}}
+                                            {...register(`queries.${index}.type` as const)}
+                                            className={errors?.queries?.[index]?.type ? "error" : ""}
+                                            defaultValue={field.type}>
+                                            <option value={QueryType.List}>List</option>
+                                            <option value={QueryType.Detail} disabled={index === 0}>Detail</option>
+                                            <option value={QueryType.Image} disabled={index === 0}>Image</option>
+                                        </Form.Select>
+                                        <Form.Control
+                                            style={{width: '70%'}}
+                                            placeholder="query"
+                                            type="text"
+                                            {...register(`queries.${index}.query` as const, {
+                                                required: true
+                                            })}
+                                            className={errors?.queries?.[index]?.query ? "error" : ""}
+                                            defaultValue={field.query}
+                                        />
+                                        <InputGroup.Text>$</InputGroup.Text>
+                                        <Form.Control
+                                            style={{width: '10%'}}
+                                            placeholder="variable"
+                                            type="text"
+                                            {...register(`queries.${index}.variable` as const, {
+                                                required: true
+                                            })}
+                                            className={errors?.queries?.[index]?.variable ? "error" : ""}
+                                            defaultValue={field.variable}
+                                        />
+                                        <Button
+                                            variant="outline-danger"
+                                            onClick={() => remove(index)}
+                                            disabled={index === 0}
+                                        >
+                                            🗑️
+                                        </Button>
+                                    </InputGroup>
                                 );
                             })}
 
-                            <Button
-                                variant="outline-primary"
-                                onClick={() =>
-                                    append({
-                                        type: QueryType.List,
-                                        query: 'What is the name of the top 5 trending food dishes?',
-                                        variable: 'dish'
-                                    })
-                                }
-                            >
-                                ➕ Add
-                            </Button>
-                            <Button variant="primary" type="submit">
-                                Execute
-                            </Button>
+                            <ButtonGroup aria-label="Basic example" className="mb-3">
+                                <Button
+                                    variant="outline-primary"
+                                    onClick={() =>
+                                        append({
+                                            type: QueryType.List,
+                                            query: 'What is the name of the top 5 trending food dishes?',
+                                            variable: 'dish'
+                                        })
+                                    }
+                                >
+                                    ➕ Add
+                                </Button>
+                                <Button variant="primary" type="submit">
+                                    🏃 Execute
+                                </Button>
+                            </ButtonGroup>
                         </fieldset>
                     </Form>
                 </Col>
             </Row>
             <Row>
                 <Col>
-                    <Execute data={executeQueries} executing={executing} callback={setExecuting} />
+                    <Execute data={executeQueries} executing={executing} callback={setExecuting}/>
                 </Col>
             </Row>
             <Row>

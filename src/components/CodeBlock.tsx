@@ -110,11 +110,11 @@ ${end}
 echo "Completed"
 `
     return <>
-        <SyntaxHighlighter showLineNumbers={true} style={docco}>
-            {codeString}
-        </SyntaxHighlighter>
         <Button onClick={() => navigator.clipboard.writeText(codeString)} variant="outline-dark">
             📋 Copy to Clipboard
         </Button>
+        <SyntaxHighlighter showLineNumbers={true} style={docco}>
+            {codeString}
+        </SyntaxHighlighter>
     </>;
 });

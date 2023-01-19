@@ -11,7 +11,7 @@ export const Execute = (
     {data, executing, callback}: { data: FormValues, executing: boolean, callback: (value: boolean) => void }) => {
 
     const [results, setResults] = useState<StringMap[]>([]);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<React.ReactNode | null>(null);
     const [progress, setProgress] = useState<number>(0);
 
     function replaceFunction(prompt: string, vars: StringMap) {
@@ -26,13 +26,14 @@ export const Execute = (
             .join('');
     }
 
-    async function extracted(vars: StringMap, query: Query, index: number): Promise<StringMap[]> {
-        let prompt = replaceFunction(query.query, vars);
-        if (query.type == QueryType.List) {
-            prompt = prompt + ' Write the results in a json array containing only strings.'
+    function getResponsePromise(query: Query, prompt: string): Promise<string> {
+        const localStorageKey = prompt;
+        const item = localStorage.getItem(localStorageKey);
+        if (item) {
+            console.log('resolved from config ' + localStorageKey)
+            return Promise.resolve(item)
         }
-
-        const results = await fetch('https://api.openai.com/v1/completions', {
+        return fetch('https://api.openai.com/v1/completions', {
             headers: {
                 'Authorization': `Bearer ${data.apiKey}`,
                 'Content-Type': 'application/json',
@@ -45,20 +46,34 @@ export const Execute = (
                 max_tokens: 500,
             })
         }).then(result => {
-            console.log(result)
             if (result.ok) {
-                return result.json()
+                return result.json().then(json => {
+                    const resultText = json.choices[0].text;
+                    localStorage.setItem(localStorageKey, resultText);
+                    return resultText;
+                })
             } else {
                 result.json().then(json => {
-                    setError(`Received error from OpenAI status:${result.status}, body:${json}`)
+                    setError(<>Received error from Open AI status: {result.status}, body:<pre>{JSON.stringify(json)}</pre></>);
+                    setProgress(0);
+                    callback(false);
                 });
+                throw new Error('Something went wrong!')
             }
-        }).then(json => {
-            console.log(json)
+        })
+    }
+
+    async function extracted(vars: StringMap, query: Query, index: number): Promise<StringMap[]> {
+        let prompt = replaceFunction(query.query, vars);
+        if (query.type == QueryType.List) {
+            prompt = prompt + ' Write the results in a json array containing only strings.'
+        }
+
+        const results = await getResponsePromise(query, prompt).then(json => {
             if (query.type == QueryType.List) {
-                return JSON.parse(json.choices[0].text);
+                return JSON.parse(json);
             } else {
-                return json.choices[0].text;
+                return json;
             }
         });
 
@@ -101,11 +116,12 @@ export const Execute = (
             const results = await extracted(vars, data.queries[0], 0);
             console.log(results);
             setResults(results);
-            setProgress(100);
+            setProgress(0);
             callback(false);
         }
 
-        if (data.queries.length > 0 && executing) {
+        if (data.queries.length > 0 && executing && progress === 0) {
+            localStorage.setItem('api-key', data.apiKey);
             setResults([]);
             setProgress(2);
             setError(null);
@@ -131,20 +147,20 @@ export const Execute = (
     }
 
     return <>
-        {progress < 100 &&
-            <Row>
-                <Col>
-                    <ProgressBar variant="success" animated now={progress}/>
-                </Col>
-            </Row>
-        }
-        <Row>
+        <Row className="mb-3">
             <Col>
                 <h1>Results</h1>
             </Col>
         </Row>
-        {results.length &&
-            <Row>
+        {progress > 0 && progress < 100 ?
+            <Row className="mb-3">
+                <Col>
+                    <ProgressBar variant="success" animated now={progress}/>
+                </Col>
+            </Row> : null
+        }
+        {results.length ?
+            <Row className="mb-3">
                 <Col>
                     <Table striped bordered hover>
                         <thead>
@@ -168,7 +184,7 @@ export const Execute = (
                         </tbody>
                     </Table>
                 </Col>
-            </Row>
+            </Row> : null
         }
     </>;
 };
