@@ -23,6 +23,9 @@ const Total = ({control}: { control: Control<FormValues> }) => {
     </Accordion>;
 };
 
+// gatsby uses some server side rendering, and this doesn't work as localStorage isn't available
+const safeGetApiKey = typeof window !== 'undefined' ? localStorage.getItem('api-key') : null;
+
 export default function App() {
     const {
         register,
@@ -31,7 +34,7 @@ export default function App() {
         formState: {errors}
     } = useForm<FormValues>({
         defaultValues: {
-            apiKey: localStorage.getItem('api-key') || '',
+            apiKey: safeGetApiKey || '',
             queries: [{
                 type: QueryType.List,
                 query: 'What are the names of the five most popular cities to visit in Colombia for tourists?',
@@ -86,9 +89,7 @@ export default function App() {
                                     placeholder="Your Open AI API Key"
                                     {...register("apiKey", {required: true})}
                                 />
-                                <Button
-                                    onClick={() => window.open("https://beta.openai.com/account/api-keys", "_blank")}
-                                >
+                                <Button variant="outline-secondary" href="https://beta.openai.com/account/api-keys" target="_blank">
                                     🔎
                                 </Button>
                             </InputGroup>

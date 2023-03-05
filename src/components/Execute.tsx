@@ -1,11 +1,8 @@
-import { FormValues, Query, QueryType } from "./Model";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Alert, Col, ProgressBar, Row, Table } from "react-bootstrap";
-
-type StringMap = {
-    [key: string]: string;
-};
+import { FormValues, Query, QueryType, StringMap } from "./Model";
+import { Download } from "./Download";
 
 export const Execute = (
     {data, executing, callback}: { data: FormValues, executing: boolean, callback: (value: boolean) => void }) => {
@@ -54,7 +51,10 @@ export const Execute = (
                 })
             } else {
                 result.json().then(json => {
-                    setError(<>Received error from Open AI status: {result.status}, body:<pre>{JSON.stringify(json)}</pre></>);
+                    setError(<>
+                        Received error from Open AI status: {result.status}, body:
+                        <pre>{JSON.stringify(json)}</pre>
+                    </>);
                     setProgress(0);
                     callback(false);
                 });
@@ -151,6 +151,9 @@ export const Execute = (
             <Col>
                 <h1>Results</h1>
             </Col>
+            <Col>
+                <Download results={results} queries={data.queries} />
+            </Col>
         </Row>
         {progress > 0 && progress < 100 ?
             <Row className="mb-3">
@@ -168,7 +171,10 @@ export const Execute = (
                             {
                                 Object
                                     .entries(results[0])
-                                    .map(([name, value], n: number) => <th key={`content_header_${n}`}>{name}</th>)
+                                    .map(([name, value], n: number) => <th
+                                        style={{textTransform: "capitalize"}}
+                                        key={`content_header_${n}`}>{name.replaceAll('_', ' ')}</th>
+                                    )
                             }
                         </tr>
                         </thead>

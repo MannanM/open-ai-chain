@@ -14,3 +14,7 @@ export type FormValues = {
     apiKey: string;
     queries: Query[];
 };
+
+export type StringMap = {
+    [key: string]: string;
+};
